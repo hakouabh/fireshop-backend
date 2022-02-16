@@ -1,6 +1,6 @@
 {
-    "name": "laravel/fireshop",
-    "version": "2.0.4",
+    "name": "laravel/fireshop-entreprise",
+    "version": "2.0.5",
     "description": "The Light/Responsive Inventory Management System.",
     "keywords": ["software", "inventory", "management", "system"],
     "license": "MIT",
@@ -39,7 +39,11 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-        }
+        },
+        "classmap": [
+            "database/seeds",
+            "database/factories"
+        ]
     },
     "scripts": {
         "post-autoload-dump": [
