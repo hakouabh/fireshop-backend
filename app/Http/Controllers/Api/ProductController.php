@@ -44,8 +44,12 @@ class ProductController extends Controller
             }    
             $ext = $request->file('image')->getClientOriginalExtension();
             $filename = time().".".$ext;
-        
-            $path =Storage::putFileAs('public/products/'.$request->id.'/', $request->file('image'), $filename); 
+            // Get all files in a directory
+            $files =   Storage::allFiles('public/products/'.$request->id.'/');
+
+            // Delete Files
+            Storage::delete($files);
+            $path = Storage::putFileAs('public/products/'.$request->id.'/', $request->file('image'), $filename); 
             $product->update([
                 'image' => env('APP_URL').Storage::disk('local')->url($path),
             ]);

@@ -56,7 +56,6 @@ class AuthController extends Controller
 
         $company = Company::create([
             'name' => $request->input('company.name'),
-            'expire_at' => Carbon::now()->addMonth(),
             'type_id' => ($request->input('company.type.id')) ? $request->input('company.type.id') : CompanyType::create(['name' => $request->input('company.type')])->id
         ]);
 

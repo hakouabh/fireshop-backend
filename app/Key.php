@@ -3,15 +3,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\User;
+use App\Company;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use App\Traits\HasStatusAttribute;
+use App\Traits\Uuids;
 
 class Key extends Model
 {
-    use HasStatusAttribute;
+    use Uuids, HasStatusAttribute;
 
     /**
      * @var bool
@@ -30,9 +31,9 @@ class Key extends Model
     protected $fillable = [
         'id',
         'status',
-        'plan_id',
-        'user_id',
-        'domain',
+        'plan_type',
+        'company_id',
+        'lifetime',
         'activated_at'
     ];
 
@@ -60,8 +61,8 @@ class Key extends Model
      */
     public function getExpiresAtAttribute()
     {
-        if ($this->isActivated() && $this->plan->isExpirable()) {
-            return $this->activated_at->addSeconds($this->plan->lifetime);
+        if ($this->isActivated()) {
+            return $this->activated_at->addSeconds($this->lifetime);
         }
 
         return null;
@@ -73,16 +74,7 @@ class Key extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Related plan model
-     * @return BelongsTo
-     */
-    public function plan()
-    {
-        return $this->belongsTo(Plan::class);
+        return $this->belongsTo(Company::class);
     }
 
     /**
@@ -104,39 +96,6 @@ class Key extends Model
     }
 
     /**
-     * Filter by plan ID
-     * @param Builder $query
-     * @param int $planId
-     * @return Builder
-     */
-    public function scopeOfPlan(Builder $query, $planId)
-    {
-        return $query->where('plan_id', $planId);
-    }
-
-    /**
-     * Filter by domain
-     * @param Builder $query
-     * @param $domain
-     * @return Builder
-     */
-    public function scopeOfDomain(Builder $query, $domain)
-    {
-        return $query->where('domain', $domain);
-    }
-
-    /**
-     * Filter by domain using LIKE
-     * @param Builder $query
-     * @param $domain
-     * @return Builder
-     */
-    public function scopeOfDomainLike(Builder $query, $domain)
-    {
-        return $query->where('domain', 'like', "%$domain%");
-    }
-
-    /**
      * Filter by activated property
      * @param Builder $query
      * @return Builder
@@ -147,20 +106,6 @@ class Key extends Model
     }
 
     /**
-     * Filter by valid status
-     * @param Builder $query
-     * @return mixed
-     */
-    public function scopeValid(Builder $query)
-    {
-        return $query->join('plans', 'plans.id', '=', 'keys.plan_id')
-            ->whereRaw('keys.status > 0')
-            ->whereRaw('keys.activated_at IS NOT NULL')
-            ->whereRaw('plans.status > 0')
-            ->whereRaw('(plans.lifetime IS NULL OR keys.activated_at >= NOW() - INTERVAL plans.lifetime SECOND)');
-    }
-
-    /**
      * Whether the key is valid
      * @return bool
      */
@@ -168,8 +113,6 @@ class Key extends Model
     {
         return $this->isActive()
             && $this->isActivated()
-            && $this->plan instanceof Plan
-            && $this->plan->isActive()
             && !$this->isExpired();
     }
 
@@ -181,9 +124,7 @@ class Key extends Model
     {
         return $this->isActive()
             && !$this->isActivated()
-            && $this->plan instanceof Plan
-            && $this->plan->isActive()
-            && $this->user instanceof User;
+            && $this->user instanceof Company;
     }
 
     /**
@@ -192,7 +133,6 @@ class Key extends Model
      */
     public function isExpired(): bool
     {
-        return $this->plan->isExpirable()
-            && $this->activated_at->lt(now()->subSeconds($this->plan->lifetime));
+        return $this->activated_at->lt(now()->subSeconds($this->lifetime));
     }
 }

@@ -14,6 +14,5 @@ class CompanySeeder extends Seeder
     public function run()
     {
         // factory(App\Company::class)->create();
-        Company::where('expire_at', null)->update(['expire_at' => Carbon::now()->addMonth()]);
     }
 }

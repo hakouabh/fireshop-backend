@@ -26,7 +26,6 @@ class CreateTableCompanies extends Migration
             $table->string('name');
             $table->unsignedBigInteger('type_id')->index();
             $table->foreign('type_id')->references('id')->on('company_types');
-            $table->timestamp('expire_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

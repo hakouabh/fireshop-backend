@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 
 class Company extends Model
@@ -16,8 +18,7 @@ class Company extends Model
      */
     protected $fillable = [
       'name',
-      'type_id',
-      'expire_at'
+      'type_id'
     ];
 
     /**
@@ -33,6 +34,7 @@ class Company extends Model
      * @var bool
      */
     public $incrementing = true;
+
     protected $casts = [
       'created_at' => 'datetime:Y-m-d H:i:s',
       'updated_at' => 'datetime:Y-m-d H:i:s',
@@ -49,5 +51,23 @@ class Company extends Model
     public function users()
     {
       return $this->hasMany('\App\User');
+    }
+
+    /**
+     * Load related key models
+     * @return HasMany
+     */
+    public function keys()
+    {
+        return $this->hasMany(Key::class);
+    }
+
+    /**
+     * Load related key models
+     * @return HasOne
+     */
+    public function activeKey()
+    {
+        return $this->hasOne(Key::class)->where('status', true)->latest();
     }
 }

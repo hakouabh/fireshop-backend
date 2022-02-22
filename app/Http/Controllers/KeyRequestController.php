@@ -7,7 +7,6 @@ use Exception;
 use GuzzleHttp\TransferStats;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Key;
 use App\Secret;
 use App\KeyService;
 

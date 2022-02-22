@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OperationController;
 use App\Http\Controllers\Api\V2\OrderController as OrderControllerV2;
 use App\Http\Controllers\Api\V2\StatsController as StatsControllerV2;
+use App\Http\Controllers\LicenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +51,7 @@ Route::prefix('auth')->group(function () {
 Route::prefix('stats')->group(function () {
 
   Route::get('/', [StatsController::class, 'stats'])->middleware('auth:api');
-  Route::get('/top/products', [StatsController::class, 'topProducts'])->middleware(['auth:api', 'expired']);
+  Route::get('/top/products', [StatsController::class, 'topProducts'])->middleware(['auth:api', 'hasLicense']);
 
 });
 // Products API
@@ -128,8 +129,8 @@ Route::prefix('orders')->group(function () {
 // Orders API V2
 Route::prefix('ordersV2')->group(function () {
 
-  Route::post('/add', [OrderControllerV2::class, 'add'])->middleware(['auth:api', 'expired']);
-  Route::get('/get', [OrderControllerV2::class, 'get'])->middleware(['auth:api', 'expired']);
+  Route::post('/add', [OrderControllerV2::class, 'add'])->middleware(['auth:api', 'hasLicense']);
+  Route::get('/get', [OrderControllerV2::class, 'get'])->middleware(['auth:api', 'hasLicense']);
   Route::get('/quantity', [OrderControllerV2::class, 'updateQuantity'])->middleware('auth:api');
   Route::get('/delete/{id}', [OrderControllerV2::class, 'delete'])->middleware('auth:api');
   Route::get('/return/{id}', [OrderControllerV2::class, 'Return'])->middleware('auth:api');
@@ -141,13 +142,14 @@ Route::prefix('ordersV2')->group(function () {
 // Operation API
 Route::prefix('operations')->group(function () {
 
-  Route::get('/validateOperation', [OperationController::class, 'validateOperation'])->middleware(['auth:api', 'expired']);
-  Route::get('/', [OperationController::class, 'get'])->middleware(['auth:api', 'expired']);
+  Route::get('/validateOperation', [OperationController::class, 'validateOperation'])->middleware(['auth:api', 'hasLicense']);
+  Route::get('/', [OperationController::class, 'get'])->middleware(['auth:api', 'hasLicense']);
   Route::get('/export', [OperationController::class, 'export'])->middleware('auth:api');
   Route::get('/view/{id}', [OperationController::class, 'viewOperation'])->middleware('auth:api');
   Route::get('/stats', [StatsControllerV2::class, 'stats'])->middleware('auth:api');
 
 });
+Route::get('/gerenateKey', [LicenseController::class, 'gerenateKey'])->middleware('auth:api');
 
 Route::group(['middleware' => [
   'throttle:' . config('licensor.request_throttle')]], function () {

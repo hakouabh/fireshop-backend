@@ -15,22 +15,17 @@ class CreateKeysTable extends Migration
     {
         Schema::create('keys', function (Blueprint $table) {
 
-            $table->string('id')->primary()->unique();
+            $table->uuid('id')->primary();
             $table->boolean('status')->default(false);
-            $table->unsignedBigInteger('plan_id');
-            $table->unsignedBigInteger('user_id');
-            $table->string('domain');
+            $table->integer('plan_type');
+            $table->unsignedInteger('lifetime');
+            $table->unsignedBigInteger('company_id');
             $table->timestamp('activated_at')->nullable();
             $table->timestamps();
 
-            $table->foreign('plan_id')
+            $table->foreign('company_id')
                 ->references('id')
-                ->on('plans')
-                ->onDelete('cascade');
-
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
+                ->on('companies')
                 ->onDelete('cascade');
         });
     }
