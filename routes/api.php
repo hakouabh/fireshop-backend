@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Api\StatsController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductTypeController;
 use App\Http\Controllers\Api\ChargeController;
@@ -13,7 +12,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OperationController;
 use App\Http\Controllers\Api\V2\OrderController as OrderControllerV2;
-use App\Http\Controllers\Api\V2\StatsController as StatsControllerV2;
+use App\Http\Controllers\Api\V2\StatsController;
 use App\Http\Controllers\LicenseController;
 
 /*
@@ -50,7 +49,6 @@ Route::prefix('auth')->group(function () {
 // Stats API
 Route::prefix('stats')->group(function () {
 
-  Route::get('/', [StatsController::class, 'stats'])->middleware('auth:api');
   Route::get('/top/products', [StatsController::class, 'topProducts'])->middleware(['auth:api', 'hasLicense']);
 
 });
@@ -146,7 +144,7 @@ Route::prefix('operations')->group(function () {
   Route::get('/', [OperationController::class, 'get'])->middleware(['auth:api', 'hasLicense']);
   Route::get('/export', [OperationController::class, 'export'])->middleware('auth:api');
   Route::get('/view/{id}', [OperationController::class, 'viewOperation'])->middleware('auth:api');
-  Route::get('/stats', [StatsControllerV2::class, 'stats'])->middleware('auth:api');
+  Route::get('/stats', [StatsController::class, 'stats'])->middleware('auth:api');
 
 });
 Route::get('/gerenateKey', [LicenseController::class, 'gerenateKey'])->middleware('auth:api');

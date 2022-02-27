@@ -244,7 +244,6 @@ class ProductController extends Controller
                 })]
             ]);
         }
-        Log::alert($request->all());
         $product->update([
           'name' => $request->input('name'),
           'sku' => $request->input('sku'),

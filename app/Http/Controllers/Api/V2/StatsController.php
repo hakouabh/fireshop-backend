@@ -12,16 +12,15 @@ use App\Customer;
 use App\Order;
 use App\Charge;
 use DB;
-use Log;
 
 class StatsController extends Controller
 {
     public function stats(Request $request){
       $weeks = [0,1,2,3,4,5,6];
-      $dt_from  = Carbon::now()->startOfWeek()->addDays(-1);
-      $dt_to = Carbon::now()->endOfWeek()->addDays(-1);
-      $lt_from  = Carbon::now()->subWeek()->startOfWeek()->addDays(-1);
-      $lt_to = Carbon::now()->subWeek()->endOfWeek()->addDays(-1);
+      $dt_from  = Carbon::now()->startOfWeek();
+      $dt_to = Carbon::now()->endOfWeek();
+      $lt_from  = Carbon::now()->subWeek()->startOfWeek();
+      $lt_to = Carbon::now()->subWeek()->endOfWeek();
 
       $products = Product::where('company_id', Auth::user()->company->id)->whereNull('deleted_at')->count();
       $customers = Customer::where('company_id', Auth::user()->company->id)->whereNull('deleted_at')->count();
@@ -136,4 +135,28 @@ class StatsController extends Controller
 
         return response()->json($this->content, $this->content['status'], [], JSON_NUMERIC_CHECK);
     }
+    public function topProducts(Request $request){
+      $top_products = DB::table('order_details')
+               ->join('products', 'order_details.product_id', '=', 'products.id')
+               ->join('orders', 'order_details.order_id', '=', 'orders.id')
+               ->where([
+                 'products.company_id' => Auth::user()->company->id,
+                 'orders.deleted_at' => null
+                ])
+               ->select(DB::raw('products.id, products.name, products.stock, count(product_id) as orders, sum(amount) as sold'))
+               ->orderBy('sold', 'desc')
+               ->groupBy('product_id')
+               ->take(5)
+               ->get();
+
+      if($this->content['data'] = $top_products){
+        $this->content['status'] = 200;
+        return response()->json($this->content, $this->content['status'], [], JSON_NUMERIC_CHECK);
+      }
+
+      $this->content['error'] = "Server Error";
+      $this->content['status'] = 500;
+
+      return response()->json($this->content, $this->content['status'], [], JSON_NUMERIC_CHECK);
+  }
 }

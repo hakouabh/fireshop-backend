@@ -16,7 +16,7 @@ class HasLicense
      */
     public function handle(Request $request, Closure $next)
     {
-        abort_unless(Auth::check() && !Auth::user()->company->activeKey->isExpired(), 495);
+        abort_unless(Auth::check() && Auth::user()->company->activeKey && !Auth::user()->company->activeKey->isExpired(), 495);
         return $next($request);
     }
 }
