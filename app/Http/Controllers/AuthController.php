@@ -56,7 +56,7 @@ class AuthController extends Controller
 
         $company = Company::create([
             'name' => $request->input('company.name'),
-            'type_id' => ($request->input('company.type.id')) ? $request->input('company.type.id') : CompanyType::create(['name' => $request->input('company.type')])->id
+            'type_id' => $request->input('company.type_id')
         ]);
 
         $user = User::create([
