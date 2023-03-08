@@ -63,4 +63,8 @@ class Operation extends Model
     {
       return $this->belongsTo('\App\Company');
     }
+    public function site()
+    {
+      return $this->belongsTo('\App\Site');
+    }
 }

@@ -51,7 +51,7 @@ class ProductController extends Controller
             Storage::delete($files);
             $path = Storage::putFileAs('public/products/'.$request->id.'/', $request->file('image'), $filename); 
             $product->update([
-                'image' => env('APP_URL').Storage::disk('local')->url($path),
+                'image' => config('app.url').Storage::disk('local')->url($path),
             ]);
         }
     }
@@ -188,15 +188,18 @@ class ProductController extends Controller
     { 
         $validateData = $request->validate([
             'name' => 'required|min:3',
-            'sku' => [Rule::unique('products')->where(function ($query) use ($request) {
-                return $query->where('company_id', Auth::user()->company->id);
-            })],
             'type' => 'required',
             'stock' => 'required|integer|min:0',
             'cost' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0'
         ]);
-
+        if($request->sku){
+            $validateData = $request->validate([
+                'sku' => [Rule::unique('products')->where(function ($query) use ($request) {
+                    return $query->where('site_id', Auth::user()->site->id);
+                })],
+            ]);
+        }
         $product = Product::create([
           'sku' => $request->input('sku'),
           'name' => $request->input('name'),
@@ -204,17 +207,19 @@ class ProductController extends Controller
           'type_id' => ($request->input('type.id')) ? $request->input('type.id') : ProductType::create(['name' => $request->input('type')])->id,
           'stock' => $request->input('stock'),
           'cost' => $request->input('cost'),
+          'site_id' => ($request->input('site_id') ? $request->input('site_id') : Auth::user()->site->id),
           'selling_price' => $request->input('selling_price'),
           'company_id' => Auth::user()->company->id
         ]);
-
+        // integration des sites
         $stock = Stock::create([
             'quantity' => $request->input('stock'),
             'initial_quantity' => $product->stock,
             'cost' => $request->input('cost'),
             'selling_price' => $request->input('selling_price'),
             'product_id' => $product->id,
-            'company_id' => Auth::user()->company->id
+            'company_id' => Auth::user()->company->id,
+            'site_id' => Auth::user()->site->id
           ]);
 
         if($this->content['data'] = Product::with('type')->where('company_id', Auth::user()->company->id)->get()){
@@ -237,7 +242,8 @@ class ProductController extends Controller
         $product = Product::with('type')
                             ->where('company_id', Auth::user()->company->id)
                             ->find($request->id);
-        if($product->sku != $request->input('sku')){
+        
+        if($request->input('sku') && $product->sku != $request->input('sku')){
             $validateData = $request->validate([
                 'sku' => [Rule::unique('products')->where(function ($query) use ($request) {
                     return $query->where('company_id', Auth::user()->company->id);
@@ -314,13 +320,14 @@ class ProductController extends Controller
         $params = (object) $request->product; 
 
         $product = Product::where('company_id', Auth::user()->company->id)->where('id', $params->id)->firstOrFail();
-
+        // integration des sites
         Stock::create([
             'quantity' => $request->input('quantity'),
             'initial_quantity' => $request->input('quantity'),
             'cost' => $request->input('cost'),
             'selling_price' => $request->input('selling_price'),
             'product_id' => $product->id,
+            'site_id' => $product->site_id,
             'is_defect' => $request->input('is_defect'),
             'company_id' => Auth::user()->company->id
           ]);

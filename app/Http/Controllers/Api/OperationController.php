@@ -57,9 +57,11 @@ class OperationController extends Controller
                 $stock->update(['initial_quantity' => $stock->quantity]);
             }
         }
+        // integration des sites
         $operation = new Operation;
         $operation->company_id = Auth::user()->company->id;
         $operation->user_id = Auth::user()->id;
+        $operation->site_id = Auth::user()->site->id;
         $operation->total = $total;
         $operation->cost = $cost;
         $operation->payment = $request->payement;

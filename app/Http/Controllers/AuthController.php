@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Support\Facades\Storage;
 use App\Company;
+use App\Site;
 use App\Autorisation;
 use App\CompanyType;
 use DB;
@@ -21,6 +22,7 @@ class AuthController extends Controller
     }
 
     public function login(Request $request){
+
         $validateData = $request->validate([
             'email' => 'required',
             'password' => 'required',
@@ -51,7 +53,8 @@ class AuthController extends Controller
             'name' => 'required',
             'phone' => 'required',
             'password' => 'required|min:8|confirmed',
-            'company' => 'required'
+            'company.name' => 'required',
+            'company.type_id' => 'required'
         ]);
 
         $company = Company::create([
@@ -59,11 +62,17 @@ class AuthController extends Controller
             'type_id' => $request->input('company.type_id')
         ]);
 
+        $site = Site::create([
+            'name' => $request->input('company.name'),
+            'company_id' => $company->id
+        ]);
+
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'phone' => $request->input('phone'),
             'company_id' => $company->id,
+            'site_id' => $site->id,
             'password' => bcrypt($request->input('password')),
         ]);
         $autorisation = Autorisation::create([
@@ -123,7 +132,6 @@ class AuthController extends Controller
         $validateData = $request->validate([
             'email' => 'required|unique:users|max:255',
             'name' => 'required',
-            'role' => 'required',
             'password' => 'required|min:8|confirmed',
         ]);
 
@@ -140,12 +148,13 @@ class AuthController extends Controller
         
             $path =Storage::putFileAs('public/users/'.Auth::user()->company->id.'/', $request->file('image'), $filename); 
 
-            $image = env('APP_URL').Storage::disk('local')->url($path);
+            $image = config('app.url').Storage::disk('local')->url($path);
         }
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'role' => $request->input('role'),
+            'site_id' => ($request->input('site_id') ? $request->input('site_id') : Auth::user()->site->id),
             'image' => $image,
             'company_id' => Auth::user()->company->id,
             'password' => bcrypt($request->input('password')),

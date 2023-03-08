@@ -30,8 +30,19 @@ class CreateTableCompanies extends Migration
             $table->timestamps();
 
         });
+        Schema::create('sites', function (Blueprint $table) {
+            $table->id('id');
+            $table->string('name');
+            $table->unsignedBigInteger('company_id')->index();
+            $table->foreign('company_id')->references('id')->on('companies');
+            $table->softDeletes();
+            $table->timestamps();
+
+        });
 
         Schema::table('users', function (Blueprint $table) {
+            $table->unsignedBigInteger('site_id')->index();
+            $table->foreign('site_id')->references('id')->on('sites');
             $table->unsignedBigInteger('company_id')->index();
             $table->foreign('company_id')->references('id')->on('companies');
         });
@@ -47,7 +58,10 @@ class CreateTableCompanies extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign('users_company_id_foreign');
             $table->dropColumn('company_id');
+            $table->dropForeign('users_site_id_foreign');
+            $table->dropColumn('site_id');
         });
+        Schema::dropIfExists('sites');
         Schema::dropIfExists('companies');
         Schema::dropIfExists('company_types');
     }

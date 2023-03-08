@@ -17,6 +17,8 @@ class CreateStocksTable extends Migration
             $table->id('id');
             $table->unsignedBigInteger('company_id')->index();
             $table->foreign('company_id')->references('id')->on('companies');
+            $table->unsignedBigInteger('site_id')->index();
+            $table->foreign('site_id')->references('id')->on('sites');
             $table->unsignedBigInteger('product_id')->index();
             $table->foreign('product_id')->references('id')->on('products');
             $table->integer('quantity');

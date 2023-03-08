@@ -32,6 +32,8 @@ class CreateProductsTable extends Migration
             $table->foreign('type_id')->references('id')->on('product_types');
             $table->unsignedBigInteger('company_id')->index();
             $table->foreign('company_id')->references('id')->on('companies');
+            $table->unsignedBigInteger('site_id')->index();
+            $table->foreign('site_id')->references('id')->on('sites');
             $table->integer('stock');
             $table->double('cost');
             $table->double('selling_price');

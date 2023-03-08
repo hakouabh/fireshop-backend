@@ -29,6 +29,7 @@ class ProductImport implements ToCollection, WithHeadingRow
             }
             $product = Product::create([
                 'company_id' => Auth::user()->company->id,
+                'site_id' => Auth::user()->site->id,
                 'name' => $row['name'],
                 'sku' => $row['sku'],
                 'type_id' =>$id,
@@ -36,10 +37,11 @@ class ProductImport implements ToCollection, WithHeadingRow
                 'cost' => $row['cost'],
                 'selling_price' => $row['selling_price'],
             ]);
-            
+            // integration des sites
             Stock::create([
                 'company_id' => Auth::user()->company->id,
                 'product_id' => $product->id,
+                'site_id' => $product->site_id,
                 'quantity' => $row['stock'],
                 'initial_quantity' => $row['stock'],
                 'cost' => $row['cost'],

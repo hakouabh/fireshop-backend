@@ -24,7 +24,8 @@ class Product extends Model
       'cost',
       'selling_price',
       'image',
-      'company_id'
+      'company_id',
+      'site_id'
     ];
     protected $casts = [
       'created_at' => 'datetime:Y-m-d H:i:s',
@@ -59,6 +60,10 @@ class Product extends Model
     public function company()
     {
       return $this->belongsTo('\App\Company');
+    }
+    public function site()
+    {
+      return $this->belongsTo('\App\Site');
     }
 
     public function stocks()

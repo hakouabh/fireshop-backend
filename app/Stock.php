@@ -21,6 +21,7 @@ class Stock extends Model
       'company_id',
       'quantity',
       'is_defect',
+      'site_id',
       'initial_quantity'
     ];
 
@@ -53,5 +54,9 @@ class Stock extends Model
     public function company()
     {
       return $this->belongsTo('\App\Company');
+    }
+    public function site()
+    {
+      return $this->belongsTo('\App\Site');
     }
 }

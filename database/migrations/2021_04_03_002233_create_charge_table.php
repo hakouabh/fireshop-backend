@@ -31,6 +31,8 @@ class CreateChargeTable extends Migration
             $table->foreign('type_id')->references('id')->on('charge_types');
             $table->unsignedBigInteger('company_id')->index();
             $table->foreign('company_id')->references('id')->on('companies');
+            $table->unsignedBigInteger('site_id')->index();
+            $table->foreign('site_id')->references('id')->on('sites');
             $table->unsignedBigInteger('user_id')->index();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

@@ -86,11 +86,16 @@ class ChargeController extends Controller
 
     public function add(Request $request)
     {   
+      $validateData = $request->validate([
+          'amount' => 'required',
+          'type_id' => 'required'
+      ]);
         $charge = Charge::create([
           'amount' => $request->input('amount'),
-          'type_id' => ($request->input('type.id')) ? $request->input('type.id') : ChargeType::create(['name' => $request->input('type')])->id,
+          'type_id' => $request->input('type_id'),
           'company_id' => Auth::user()->company->id,
           'user_id' => Auth::user()->id,
+          'site_id' => Auth::user()->site->id,
           'description' => $request->input('description')
         ]);
 

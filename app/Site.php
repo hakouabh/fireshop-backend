@@ -5,28 +5,19 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-use DB;
 
-class Charge extends Model
+class Site extends Model
 {
-    use  SoftDeletes;
+    use SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-      'amount',
-      'type_id',
-      'company_id',
-      'user_id',
-      'site_id',
-      'description'
+      'name', 'company_id'
     ];
-    protected $casts = [
-      'created_at' => 'datetime:Y-m-d H:i:s',
-      'updated_at' => 'datetime:Y-m-d H:i:s',
-    ];
+
     /**
      * The attributes that should be mutated to dates.
      *
@@ -41,14 +32,18 @@ class Charge extends Model
      */
     public $incrementing = true;
 
-    protected $hidden = [
-      'type_id',
-      'company_id'
+    protected $casts = [
+      'created_at' => 'datetime:Y-m-d H:i:s',
+      'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
-    public function type()
+    public function users()
     {
-      return $this->belongsTo('\App\ChargeType');
+      return $this->hasMany('\App\User');
+    }
+    public function operations()
+    {
+      return $this->hasMany('\App\Operation');
     }
 
     public function company()
