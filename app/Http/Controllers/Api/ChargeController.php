@@ -29,7 +29,7 @@ class ChargeController extends Controller
     public function get(Request $request){
         $charge = Charge::with('type')
                             ->where('company_id', Auth::user()->company->id);
-        
+                            
         if($request->has('filter')){
             $params = (object) json_decode($request->filter, true);
             
@@ -53,12 +53,9 @@ class ChargeController extends Controller
                 ]);
             }
         }
-
-        if($this->content['data'] = [
-          'total_charge' => $charge->sum('amount'),
-          'charges' => $charge->paginate($request->perpage)
-          ]){
+          if($this->content['data'] = $charge->paginate($request->perpage)){
           $this->content['status'] = 200;
+          $this->content['total_charges'] = $charge->sum('amount');
           return response()->json($this->content, $this->content['status'], [], JSON_NUMERIC_CHECK);
         }
 

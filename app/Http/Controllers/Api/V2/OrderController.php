@@ -11,7 +11,6 @@ use App\Order;
 use Carbon\Carbon;
 use App\OrderDetail;
 use App\Operation;
-use Log;
 use DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +21,6 @@ class OrderController extends Controller
     }
 
     public function add(Request $request){
-        
         $product = Product::where('company_id', Auth::user()->company->id)->where('sku', $request->sku)->first();
         if(!$product){
             $product = Product::where('company_id', Auth::user()->company->id)->where('id', $request->sku)->firstOrFail();
@@ -165,7 +163,6 @@ class OrderController extends Controller
     }
 
     public function updateQuantity(Request $request){
-
         $order = Order::with('order_detail.product')->where('id',$request->order_id)->where('company_id', Auth::user()->company->id)->first();
         $product = Product::where('company_id', Auth::user()->company->id)->where('id',$order->order_detail->product->id)->first();
 

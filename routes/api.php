@@ -61,7 +61,7 @@ Route::prefix('products')->group(function () {
   Route::get('/stock/get', [ProductController::class, 'getStock'])->middleware('auth:api');
   Route::get('/export', [ProductController::class, 'export'])->middleware('auth:api');
   Route::get('/stock/find/{id}', [ProductController::class, 'findStock'])->middleware('auth:api');
-  Route::post('/stock/update', [ProductController::class, 'updateStock'])->middleware('auth:api');
+  Route::put('/stock/update', [ProductController::class, 'updateStock'])->middleware('auth:api');
   Route::post('/stock', [ProductController::class, 'stock'])->middleware('auth:api');
   Route::post('/add', [ProductController::class, 'add'])->middleware('auth:api');
   Route::post('/addProduct', [ProductController::class, 'addProduct'])->middleware('auth:api');

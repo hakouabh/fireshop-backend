@@ -68,6 +68,8 @@ class ProductController extends Controller
     }
 
     public function updateStock(Request $request){
+        Log::alert("message");
+
         $stock = Stock::where('id',$request->id)->where('company_id', Auth::user()->company->id)->first();
         $product = Product::where('company_id', Auth::user()->company->id)->where('id', $stock->product_id)->firstOrFail();
         $product->decrement('stock',$stock->quantity);
